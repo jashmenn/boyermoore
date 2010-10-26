@@ -25,21 +25,11 @@ module BoyerMoore
   def self.prepare_goodsuffix_heuristic(normal)
     size = normal.size
     result = []
-    # left = normal[0]
-    # right = normal[size]
-    # reversed = []
-    # tmp = reversed + size   # huh
-    puts "---"
-    # pp left
-    # pp right
 
     # reverse string
     reversed = normal.dup.reverse
     prefix_normal = compute_prefix(normal)
     prefix_reversed = compute_prefix(reversed)
-
-    # pp prefix_normal
-    # pp prefix_reversed
 
     0.upto(size) do |i|
       result[i] = size - prefix_normal[size-1]
@@ -50,7 +40,6 @@ module BoyerMoore
       k = i - prefix_reversed[i]+1
       result[j] = k if result[j] > k
     end
-    # pp result
     result
   end
 
@@ -70,8 +59,6 @@ module BoyerMoore
       while (j > 0) && (needle[j-1] == haystack[s+j-1])
         j -= 1
       end
-
-      pp j
 
       if(j > 0)
         k = badcharacter[haystack[s+j-1]]
