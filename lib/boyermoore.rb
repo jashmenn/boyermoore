@@ -1,27 +1,98 @@
-#############################################################
-# Boyer-Moore for Ruby                                      #
-# Author: Arne Brasseur (myfirstname@firstnamelastname.net) #
-#                                                           #
-# Licence: public domain                                    #
-#                                                           #
-#############################################################
-
-module Kernel
-  def max(i1,i2); return i2 unless i1; return i1 unless i2; i1 > i2 ? i1 : i2; end
-end
-
-
-# This implementation is based on the C implementation found
-# on Wikipedia. The purpose is mostly educational, since 
-# String#index has the same functionality. If you want String#index
-# to use this algorithm, include this module in String.
-#
-# It is assumed your strings are UTF-8, $KCODE is ignored.
-
 module BoyerMoore    
 
-  # return the position of needle in haystack, or nil if not found
+  def self.compute_prefix(str) 
+    size = str.length
+    k = 0
+    result = [0]
+    1.upto(size - 1) do |q|
+      while (k > 0) && (str[k] != str[q])
+        k = result[k-1]
+      end
+      k += 1 if(str[k] == str[q])
+      result[q] = k
+    end
+    result
+  end
+
+  def self.prepare_badcharacter_heuristic(str)
+    result = {}
+    0.upto(str.length - 1) do |i|
+      result[str[i]] = i
+    end
+    result
+  end
+
+  def self.prepare_goodsuffix_heuristic(normal)
+    size = normal.size
+    result = []
+    # left = normal[0]
+    # right = normal[size]
+    # reversed = []
+    # tmp = reversed + size   # huh
+    puts "---"
+    # pp left
+    # pp right
+
+    # reverse string
+    reversed = normal.dup.reverse
+    prefix_normal = compute_prefix(normal)
+    prefix_reversed = compute_prefix(reversed)
+
+    # pp prefix_normal
+    # pp prefix_reversed
+
+    0.upto(size) do |i|
+      result[i] = size - prefix_normal[size-1]
+    end
+
+    0.upto(size-1) do |i|
+      j = size - prefix_reversed[i]
+      k = i - prefix_reversed[i]+1
+      result[j] = k if result[j] > k
+    end
+    # pp result
+    result
+  end
+
   def self.search(haystack, needle)
+    needle_len = needle.size
+    haystack_len = haystack.size
+
+    return nil if haystack_len == 0
+    return haystack if needle_len == 0
+
+    badcharacter = self.prepare_badcharacter_heuristic(needle)
+    goodsuffix   = self.prepare_goodsuffix_heuristic(needle)
+
+    s = 0
+    while s <= haystack_len - needle_len
+      j = needle_len
+      while (j > 0) && (needle[j-1] == haystack[s+j-1])
+        j -= 1
+      end
+
+      pp j
+
+      if(j > 0)
+        k = badcharacter[haystack[s+j-1]]
+        k = -1 unless k
+        if (k < j) && (m = j-k-1) > goodsuffix[j]
+          s += m
+        else
+          s += goodsuffix[j]
+        end
+      else
+        return s # ?
+      end
+
+    end
+    return nil
+  end
+
+
+
+  # return the position of needle in haystack, or nil if not found
+  def self.search_old(haystack, needle)# {{{
 
     # Maps a position in needle to a number of bytes to shift 
     # should the preceding byte differ  
@@ -60,14 +131,8 @@ module BoyerMoore
       hpos += max(skip[npos], npos - occ[haystack[npos+hpos]]);
       pp hpos
     end  
-  end
-
-  # Alternative index method for String
-  def index(needle)
-    BoyerMoore.search(self, needle)
-  end
-  
-  private
+  end# }}}
+  private# {{{
     def self.needlematch(needle, length, offset)  
       # puts "---------"
       # pp [needle, length, offset]
@@ -91,12 +156,8 @@ module BoyerMoore
         needle.last(needle_begin.length) == needle_begin  
       end  
     end
-
+# }}}
 end
-
-#class String
-#  include BoyerMoore
-#end
 
 # example
 
