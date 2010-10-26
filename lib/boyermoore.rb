@@ -6,25 +6,8 @@
 #                                                           #
 #############################################################
 
-# Some helpers
-
-class String  
-
-  # Take first n characters
-  def first(n=1)  
-    self.unpack('U*').first(n).pack('U*')
-  end  
-
-  # Take last n characters
-  def last(n=1)  
-    self.unpack('U*').last(n).pack('U*')
-  end  
-end
-
 module Kernel
-
-  # Shorthand
-  def max(i1,i2); i1 > i2 ? i1 : i2; end
+  def max(i1,i2); return i2 unless i1; return i1 unless i2; i1 > i2 ? i1 : i2; end
 end
 
 
@@ -40,9 +23,6 @@ module BoyerMoore
   # return the position of needle in haystack, or nil if not found
   def self.search(haystack, needle)
 
-    # Work on Arrays containing Unicode codepoint indices
-    needle, haystack = needle.unpack('U*'), haystack.unpack('U*')
-    
     # Maps a position in needle to a number of bytes to shift 
     # should the preceding byte differ  
     skip = []  
@@ -50,24 +30,24 @@ module BoyerMoore
     # Maps characters in needle to their last index in needle
     occ = Hash.new {-1}
     
-    return unless needle.length > 0;  
+    return unless needle.size > 0;  
     
     #Preprocess #1: init occ[]  
     needle[0..-2].each_with_index{|c,i| occ[c]=i}  
     
     #Preprocess #2: init skip[]  
-    needle.length.times do |i|  
+    needle.size.times do |i|  
       value=0  
-      while (value < needle.length && !needlematch(needle, i, value)) do  
+      while (value < needle.size && !needlematch(needle, i, value)) do  
         value+=1  
       end  
-      skip[needle.length-i-1] = value  
+      skip[needle.size] = value  
     end  
     
     #Search  
     hpos=0  
-    while (hpos <= haystack.length - needle.length) do  
-      npos = needle.length-1  
+    while (hpos <= haystack.size - needle.size) do  
+      npos = needle.size  
       
       # traverse the needle in reverse, if all bytes match we have a winner  
       while (needle[npos] == haystack[npos+hpos]) do
@@ -76,7 +56,9 @@ module BoyerMoore
       end  
 
       # otherwise shift, either based on skip[] or based on occ[]  
+      pp [skip[npos], npos, hpos, haystack[npos+hpos], occ[haystack[npos+hpos]]]
       hpos += max(skip[npos], npos - occ[haystack[npos+hpos]]);
+      pp hpos
     end  
   end
 
@@ -87,14 +69,25 @@ module BoyerMoore
   
   private
     def self.needlematch(needle, length, offset)  
+      # puts "---------"
+      # pp [needle, length, offset]
       #cut off offset bytes from needle  
       needle_begin = needle.first(needle.length-offset)  
+      # pp [needle_begin, needle_begin.length, length]
       
       #if both needle and needle_begin contain at least length+1 bytes 
-      if (needle_begin.length > length)  
-        needle[-length-1] != needle_begin[-length-1]  &&  
-          needle.last(length) == needle_begin.last(length)  
+      if (needle_begin.length > length)
+        # puts "here:"
+        # pp [needle[-length-1], needle_begin[-length-1]]
+        # pp [needle[-length-1] != needle_begin[-length-1]]
+        # pp [needle.last(length), needle_begin.last(length)]
+        # pp [needle.last(length) == needle_begin.last(length)]
+        (needle[-length-1] != needle_begin[-length-1]) && (needle.last(length) == needle_begin.last(length))
       else  
+        # puts "else:"
+        # pp [needle_begin.length]
+        # pp [needle.last(needle_begin.length), needle_begin]
+        # pp [needle.last(needle_begin.length) == needle_begin]
         needle.last(needle_begin.length) == needle_begin  
       end  
     end
