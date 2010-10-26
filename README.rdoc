@@ -1,0 +1,3 @@
+== boyermoore
+
+A gem that provides...
