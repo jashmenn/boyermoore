@@ -57,7 +57,6 @@ module BoyerMoore
     size = normal.size
     result = []
 
-    # reverse string
     reversed = normal.dup.reverse
     prefix_normal = compute_prefix(normal)
     prefix_reversed = compute_prefix(reversed)
