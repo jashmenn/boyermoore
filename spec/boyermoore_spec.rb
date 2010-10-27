@@ -18,10 +18,11 @@ describe "boyermoore" do
   end
 
   it "should search properly" do
-    BoyerMoore.search(%w{A N P A N M A N}, %w{A N P}).should == 0
-    BoyerMoore.search(%w{A N P A N M A N}, %w{M A N}).should == 5
-    BoyerMoore.search(%w{f o o b a r}, %w{b a r}).should == 3
-    BoyerMoore.search(%w{f o o b a r}, %w{z a r}).should == nil 
+    BoyerMoore.search("ANPANMAN", "ANP").should == 0
+    BoyerMoore.search("ANPANMAN", "ANPXX").should == nil 
+    BoyerMoore.search("ANPANMAN", "MAN").should == 5
+    BoyerMoore.search("foobar", "bar").should == 3
+    BoyerMoore.search("foobar", "zar").should == nil 
   end
 
   it "should match ruby's #index for basic strings" do
@@ -33,10 +34,13 @@ describe "boyermoore" do
   
   it "should match characters" do
     needle = "abc".split(//)
-    [["abc", 0], 
-     ["bcd", nil],
-     ["efg", nil], 
-     ["my dog abc", 7]].each do |hay,pos|
+    haystacks = {
+      "abc" => 0, 
+      "bcd" => nil,
+      "efg" => nil, 
+      "my dog abc" => 7
+    }
+    haystacks.each do |hay,pos|
       hay = hay.split(//)
       BoyerMoore.search(hay, needle).should == pos
     end
@@ -48,11 +52,13 @@ describe "boyermoore" do
 
   it "should match words" do
     needle = ["foo", "bar"]
-    [ [["foo", "bar", "baz"], 0],
-      [["bam", "bar", "bang"], nil],
-      [["put", "foo", "bar", "bar"], 1],
-      [["put", "foo", "bar", "foo", "bar"], 1]
-    ].each do |hay,pos|
+    haystacks = {
+      ["foo", "bar", "baz"] => 0,
+      ["bam", "bar", "bang"] => nil,
+      ["put", "foo", "bar", "bar"] => 1,
+      ["put", "foo", "bar", "foo", "bar"] => 1
+    }
+    haystacks.each do |hay,pos|
         BoyerMoore.search(hay, needle).should == pos
       end
   end
@@ -69,21 +75,23 @@ describe "boyermoore" do
     end
   end
 
-  it "should allow regular hash semantics" do
-    h = RichHash.new
-    h[1] = "foo"
-    h[1].should == "foo"
-  end
+  describe "richhash" do
+    it "should allow regular hash semantics" do
+      h = RichHash.new
+      h[1] = "foo"
+      h[1].should == "foo"
+    end
 
-  it "should allow regexp semantics" do
-    h = RichHash.new
-    h["a"] = "b"
-    h[/\d+/] = "bing"
-    h["a"].should == "b"
-    h["b"].should == nil
-    h["9"].should == "bing"
-    h["99"].should == "bing"
-    h["a99"].should == "bing"
+    it "should allow regexp semantics" do
+      h = RichHash.new
+      h["a"] = "b"
+      h[/\d+/] = "bing"
+      h["a"].should == "b"
+      h["b"].should == nil
+      h["9"].should == "bing"
+      h["99"].should == "bing"
+      h["a99"].should == "bing"
+    end
   end
 
 end

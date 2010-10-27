@@ -114,12 +114,3 @@ module BoyerMoore
     end
   end
 end
-
-# example
-
-if $0 == __FILE__
-  needle='abcab'
-  ['12abcabc', 'abcgghhhaabcabccccc', '123456789abc123abc', 'aabbcc'].each do |hay|
-    puts "#{BoyerMoore.search(hay, needle)} -- #{hay.index(needle)}"
-  end
-end

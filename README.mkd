@@ -1,0 +1,45 @@
+# boyermoore
+
+The Boyer-Moore string matching algorithm.
+
+Ported to ruby from [wikipedia's c code](http://en.wikipedia.org/w/index.php?title=Boyer%E2%80%93Moore_string_search_algorithm&diff=391986850&oldid=391398281), but geared towards a token search rather than merely characters.
+
+Usage: 
+
+    BoyerMoore.search(haystack, needle)   # returns index of needle or nil
+
+Examples:
+
+Basic search in string:
+
+    BoyerMoore.search("ANPANMAN", "ANP")   # => 0
+    BoyerMoore.search("ANPANMAN", "ANPXX") # => nil 
+    BoyerMoore.search("foobar", "bar")     # => 3
+
+You can also search an array of tokens:
+
+    BoyerMoore.search(["<b>", "hi", "</b>"], ["hi"])         # => 1 
+    BoyerMoore.search(["bam", "foo", "bar"], ["foo", "bar"]) # => 1 
+    BoyerMoore.search(["bam", "bar", "baz"], ["foo"])        # => nil 
+
+A token can be a regular expression:
+
+    BoyerMoore.search(["Sing", "99", "Luftballon"], [/\d+/]) == 1
+    BoyerMoore.search(["Nate Murray", "5 Pine Street", "Los Angeles", "CA", "90210"], [/^\w{2}$/, /^\d{5}$/]) == 3 
+
+# Notes
+
+The regular-expression token matching is a bit of a hack and will be fairly
+slow because every hash miss is compared against every regular expression key.
+You probably shouldn't use the regular expression token search for anything
+more than a toy.
+
+# Credits
+
+* Written by [Nate Murray](nate@natemurray.com) http://www.xcombinator.com
+* But based almost entirely on [wikipedia's c code](http://en.wikipedia.org/w/index.php?title=Boyer%E2%80%93Moore_string_search_algorithm&diff=391986850&oldid=391398281)
+* Originally I was using [Arne's code here](http://www.arnebrasseur.net/2007/02/26/boyer-moore-string-search-algorithm-in-ruby/en) but eventually I decided to scrap it and use the wikipedia code directly.
+
+
+
+
