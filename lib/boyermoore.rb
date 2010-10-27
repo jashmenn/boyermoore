@@ -1,3 +1,5 @@
+# Hash impersonator that accepts regular expressions as keys.  But the regular
+# expression lookups are slow, so don't use them (unless you have to). 
 class RichHash
   def initialize
     @regexps = {}
@@ -24,6 +26,9 @@ class RichHash
   end
 end
 
+# ported directly from this version wikipedia:
+# http://en.wikipedia.org/w/index.php?title=Boyer%E2%80%93Moore_string_search_algorithm&diff=391986850&oldid=391398281
+# it's not very rubyish but it works
 module BoyerMoore    
 
   def self.compute_prefix(str) 
