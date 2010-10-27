@@ -36,7 +36,7 @@ more than a toy.
 
 # Credits
 
-* Written by [Nate Murray](nate@natemurray.com) http://www.xcombinator.com
+* Written by [Nate Murray](nate@natemurray.com) [http://www.xcombinator.com](http://www.xcombinator.com)
 * But based almost entirely on [wikipedia's c code](http://en.wikipedia.org/w/index.php?title=Boyer%E2%80%93Moore_string_search_algorithm&diff=391986850&oldid=391398281)
 * Originally I was using [Arne's code here](http://www.arnebrasseur.net/2007/02/26/boyer-moore-string-search-algorithm-in-ruby/en) but eventually I decided to scrap it and use the wikipedia code directly.
 
