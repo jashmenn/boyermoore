@@ -1,3 +1,29 @@
+class RichHash
+  def initialize
+    @regexps = {}
+    @regular = {}
+  end
+
+  def [](k)
+    regular = @regular[k]
+    return regular if regular
+    if @regexps.size > 0
+      @regexps.each do |regex,v| # linear search is going to be slow
+        return v if regex.match(k) 
+      end
+    end
+    nil
+  end
+
+  def []=(k,v)
+    if k.kind_of?(Regexp)
+      @regexps[k] = v
+    else
+      @regular[k] = v
+    end
+  end
+end
+
 module BoyerMoore    
 
   def self.compute_prefix(str) 
@@ -15,7 +41,7 @@ module BoyerMoore
   end
 
   def self.prepare_badcharacter_heuristic(str)
-    result = {}
+    result = RichHash.new
     0.upto(str.length - 1) do |i|
       result[str[i]] = i
     end
@@ -53,10 +79,12 @@ module BoyerMoore
     badcharacter = self.prepare_badcharacter_heuristic(needle)
     goodsuffix   = self.prepare_goodsuffix_heuristic(needle)
 
+    # pp badcharacter
+
     s = 0
     while s <= haystack_len - needle_len
       j = needle_len
-      while (j > 0) && (needle[j-1] == haystack[s+j-1])
+      while (j > 0) && self.needle_matches?(needle[j-1], haystack[s+j-1])
         j -= 1
       end
 
@@ -76,6 +104,13 @@ module BoyerMoore
     return nil
   end
 
+  def self.needle_matches?(needle, haystack)
+    if needle.kind_of?(Regexp)
+      needle.match(haystack) ? true : false 
+    else
+      needle == haystack
+    end
+  end
 
 
   # return the position of needle in haystack, or nil if not found
@@ -114,9 +149,9 @@ module BoyerMoore
       end  
 
       # otherwise shift, either based on skip[] or based on occ[]  
-      pp [skip[npos], npos, hpos, haystack[npos+hpos], occ[haystack[npos+hpos]]]
+      # pp [skip[npos], npos, hpos, haystack[npos+hpos], occ[haystack[npos+hpos]]]
       hpos += max(skip[npos], npos - occ[haystack[npos+hpos]]);
-      pp hpos
+      # pp hpos
     end  
   end# }}}
   private# {{{
